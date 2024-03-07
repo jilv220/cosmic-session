@@ -8,7 +8,7 @@ target := if debug == '1' { 'debug' } else { 'release' }
 vendor_args := if vendor == '1' { '--frozen --offline' } else { '' }
 debug_args := if debug == '1' { '' } else { '--release' }
 cargo_args := vendor_args + ' ' + debug_args
-xdp_cosmic := '/usr/libexec/xdg-desktop-portal-cosmic'
+xdp_cosmic := '/usr/lib/xdg-desktop-portal-cosmic'
 
 bindir := prefix + '/bin'
 systemddir := prefix + '/lib/systemd/user'

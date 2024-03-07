@@ -9,6 +9,7 @@ mod service;
 mod systemd;
 
 use std::{
+	collections::HashMap,
 	os::fd::{AsRawFd, OwnedFd},
 	sync::Arc,
 };
@@ -22,11 +23,12 @@ use launch_pad::{process::Process, ProcessManager};
 use service::SessionRequest;
 use tokio::{
 	net::UnixStream,
+	process::Command,
 	sync::{
 		mpsc::{self, Receiver, Sender},
 		oneshot, Mutex,
 	},
-	time::Duration,
+	time::{sleep, Duration},
 };
 use tokio_util::sync::CancellationToken;
 use tracing::{metadata::LevelFilter, Instrument};
@@ -279,6 +281,17 @@ async fn start(
 		portal_extras,
 	)
 	.await;
+
+	tokio::spawn(async move {
+		sleep(Duration::from_secs(5)).await;
+		Command::new("dex")
+			.arg("-a")
+			.arg("-e")
+			.arg("cosmic")
+			.envs(env_vars.iter().cloned())
+			.spawn()
+			.expect("dex autostart failed")
+	});
 
 	let mut signals = Signals::new(vec![libc::SIGTERM, libc::SIGINT]).unwrap();
 	let mut status = Status::Exited;
